@@ -70,6 +70,10 @@
     text-align: center;
     width: 34px;
   }
+
+  .square-win {
+    background: rgb(219, 248, 152);
+  }
   
   .board-row:after {
     clear: both;
@@ -89,3 +93,6 @@
     margin-left: 20px;
   }
   
+  span {
+    font-size: 14px;
+  }
