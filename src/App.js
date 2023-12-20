@@ -64,20 +64,42 @@ function Board({ xIsNext, squares, onPlay }) {
   );
 }
 
+
 /**
  * Game is a React component representing the overall Tic-Tac-Toe game.
  * It contains the game board and game information.
  * @returns {JSX.Element} - A React element representing the Game component.
  */
 export default function Game() {
-  const [xIsNext, setXIsNext] = useState(true);
-  const [history, setHistory] = useState([Array(9).fill(null)]);
-  const currentSquares = history[history.length - 1];
+  const [history, setHistory] = useState([Array(9).fill(null)]);  // list of previous moves
+  const [currentMove, setCurrentMove] = useState(0);              // which step the user is currently viewing
+  const xIsNext = currentMove % 2 == 0;                           // whether X or O should go next
+  const currentSquares = history[currentMove];                    // squares to display on the Board
 
   function handlePlay(nextSquares) {
-    setHistory([...history, nextSquares]);
-    setXIsNext(!xIsNext);
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
   }
+
+  function jumpTo(nextMove) {
+    setCurrentMove(nextMove);
+  }
+
+  const moves = history.map((squares, move) => {
+    let description;
+    if (move > 0) {
+      description = 'Go to move #' + move;
+    } else {
+      description = 'Go to game start';
+    }
+
+    return (
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{description}</button>
+      </li>
+    );
+  });
 
   return (
     <div className="game">
@@ -85,11 +107,12 @@ export default function Game() {
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
       <div className="game-info">
-        <ol>{/*TODO*/}</ol>
+        <ol>{moves}</ol>
       </div>
     </div>
   );
 }
+
 
 /**
  * calculateWinner is a helper function that determines the winner of a Tic-Tac-Toe game.
@@ -116,20 +139,3 @@ function calculateWinner(squares) {
   }
   return null;
 }
-
-// notes
-  // since state is private to the component that defines it, you cannot update the Board's state
-  // directly from Square
-  // so we pass down a function from the Board component to the Square component, and have Square call 
-  // that function when a square is clicked
-
-
-  // we want to store the game's state in the parent Board component
-  // the Board component can tell each Square what to display by passing a prop
-  // this keeps the child components in sync with each other and with their parent
-
-  // state handling is in the Board component
-  // parent Board component passes props to the child Square components so that they can
-  // be displayed correctly
-  // when clicking on a Square, the child Square component now asks the parent Board component
-  // to update the state of the board
